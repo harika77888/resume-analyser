@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Resume Analyser</title>
+</head>
+<body>
+<h1>AI Resume Analyser</h1>
+<input type="file" id="resumeFile" accept="application/pdf">
+<button onclick="uploadResume()">Analyze Resume</button>
+<div id="results"></div>
+
+<script>
+async function uploadResume() {
+  const fileInput = document.getElementById("resumeFile");
+  const file = fileInput.files[0];
+  if (!file) {
+    alert("please select a PDF file first");
+    return;
+}
+const formData = new FormData();
+formData.append("file",file);
+
+document.getElementById("results").innerHTML = "Analyzing...";
+
+const response = await fetch("http://127.0.0.1:8000/upload", {
+ method: "POST",
+ body: formData
+});
+const data = await response.json();
+let html = "<h2>Skills Found:</h2><p>" +data.skills_found.join(", ") + "</p>";
+html += "<h2>Recommended Jobs:</h2><ul>";
+data.recommended_jobs.forEach(job => {
+  const searchQuery = encodeURIComponent(job.role);
+  html += "<li>" + job.role + " - " + job.match_percent + "% match ";
+  html += "<a href='https://www.linkedin.com/jobs/search/?keywords=" +searchQuery + "' target='_blank'>LinkedIn</a> | ";
+  html += "<a href='https://www.naukri.com/" + searchQuery + "-jobs' target='_blank'>Naukri</a> | ";
+  html += "<a href='https://www.indeed.com/jobs?q=" + searchQuery + "' target='_blank'>Indeed</a> |";
+  html += "<a href='https://www.glassdoor.com/Job/jobs.htm?sc.keyword=" + searchQuery + "' target='_blank'>Glassdoor</a>";
+  html += "<a href='https://unstop.com/jobs?searchTerm=" + searchQuery + "' target='_blank'>Unstop</a> |";
+  html += "</li><br>";
+});
+html += "</ul>";
+ 
+document.getElementById("results").innerHTML = html;
+}
+</script>
+</body>
+</html>
