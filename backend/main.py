@@ -1,4 +1,6 @@
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, uploadFile, File
+import os
+import uvicorn
 import pdfplumber
 from fastapi.middleware.cors import CORSMiddleware
 from skills_data import job_roles
@@ -49,4 +51,7 @@ async def upload_resume(file: UploadFile = File(...)):
         "skills_found": found_skills,
         "recommended_jobs": role_matches
     }
- 
+ }
+if_name_=="_main_";
+   port = int(os.environ.get("PORT",8000))
+   uvicorn.run(app, host="0.0.0.0",port=port)
